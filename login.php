@@ -1,31 +1,27 @@
 <?php
+
 include('connection.php');
 
-$user_name = $_POST['user-name'];
-$pass_word = $_POST['pass-word'];
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-$query = $mysqli->prepare('select id,username,password,first_name,last_name
-from users 
-where username=?');
-$query->bind_param('s', $user_name);
+$query = $mysqli->prepare('select first_name, last_name, username, password from users where username = ?');
+$query->bind_param('s',$username);
 $query->execute();
-
 $query->store_result();
-$query->bind_result($id, $username, $hashed_password, $first_name, $last_name);
+$query->bind_result($first_name, $last_name, $username,$hashed_password);
 $query->fetch();
 
-$num_rows = $query->num_rows();
-if ($num_rows == 0) {
-    $response['status'] = "user not found";
-} else {
-    if (password_verify($pass_word, $hashed_password)) {
-        $response['status'] = 'logged in';
-        $response['user_id'] = $id;
-        $response['first_name'] = $first_name;
-        $response['username'] = $username;
-    } else {
-        $response['status'] = "wrong password";
+if($query->num_rows() == 1){
+    if (password_verify($password, $hashed_password)) {
+    $response['status'] = 'success';
+    $response['first_name'] =$first_name;
+    $response['last_name']= $last_name;
+    $response['username'] = $username;
     }
 }
-
-echo json_encode($response);
+else {
+    $response['status'] = 'error';
+    $response['message'] = 'Invalid username or password';
+ }
+echo  json_encode($response);
