@@ -1,13 +1,13 @@
 <?php
 include('connection.php');
 
-$username = $_POST['username'];
-$password = $_POST['password'];
+$user_name = $_POST['user-name'];
+$pass_word = $_POST['pass-word'];
 
 $query = $mysqli->prepare('select id,username,password,first_name,last_name
 from users 
 where username=?');
-$query->bind_param('s', $username);
+$query->bind_param('s', $user_name);
 $query->execute();
 
 $query->store_result();
@@ -18,7 +18,7 @@ $num_rows = $query->num_rows();
 if ($num_rows == 0) {
     $response['status'] = "user not found";
 } else {
-    if (password_verify($password, $hashed_password)) {
+    if (password_verify($pass_word, $hashed_password)) {
         $response['status'] = 'logged in';
         $response['user_id'] = $id;
         $response['first_name'] = $first_name;
